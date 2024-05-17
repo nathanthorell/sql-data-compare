@@ -2,23 +2,34 @@ import os
 import time
 import pyodbc
 import json
-from utils import get_conn_string
+from utils.get_conn import get_conn_string
 
 
-def execute_sql_file(conn, sql_file):
+def execute_sql_query(conn, sql_query):
     """
     Execute a SQL file
     """
     start_time = time.time()
-    with open(sql_file, "r") as f:
-        sql_query = f.read()
-        cursor = conn.cursor()
-        cursor.execute(sql_query)
-        result = cursor.fetchall()
-        cursor.close()
+    cursor = conn.cursor()
+    cursor.execute(sql_query)
+    result = cursor.fetchall()
+    cursor.close()
     end_time = time.time()
     duration = end_time - start_time
     return result, duration
+
+
+def compare_sql(left_conn, right_conn, left_query, right_query):
+    left_result, left_duration = execute_sql_query(left_conn, left_query)
+    print(f"Left query runtime: {left_duration} seconds")
+
+    right_result, right_duration = execute_sql_query(right_conn, right_query)
+    print(f"Right query runtime: {right_duration} seconds")
+
+    if left_result == right_result:
+        return "EQUAL"
+    else:
+        return "NOT EQUAL"
 
 
 def main():
@@ -44,17 +55,13 @@ def main():
         left_sql_file_path = os.path.join(full_sql_dir, left_query_file)
         right_sql_file_path = os.path.join(full_sql_dir, right_query_file)
 
-        left_result, left_duration = execute_sql_file(left_conn, left_sql_file_path)
-        print(f"Left query runtime: {left_duration} seconds")
+        with open(left_sql_file_path, "r") as f:
+            left_query = f.read()
+        with open(right_sql_file_path, "r") as f:
+            right_query = f.read()
 
-        right_result, right_duration = execute_sql_file(right_conn, right_sql_file_path)
-        print(f"Right query runtime: {right_duration} seconds")
-
-        # Compare results
-        if left_result == right_result:
-            print(f"Comparison of [{name}] results ARE EQUAL")
-        else:
-            print(f"Results for [{name}] are NOT EQUAL")
+        compare_sql_result = compare_sql(left_conn, right_conn, left_query, right_query)
+        print(f"{name}: {compare_sql_result}")
 
     left_conn.close()
     right_conn.close()

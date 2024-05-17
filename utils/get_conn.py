@@ -16,12 +16,15 @@ def get_conn_string(type):
     user = os.getenv(f"{env_type}_DB_USER")
     password = os.getenv(f"{env_type}_DB_PASS")
     port = os.getenv(f"{env_type}_DB_PORT")
+    driver = os.getenv("DB_DRIVER")
+    encrypt = os.getenv("DB_ENCRYPT")
 
     conn = (
-        f"DRIVER={os.getenv('DRIVER')};"
+        f"DRIVER={driver};"
         f"SERVER={host},{port};"
         f"DATABASE={db};"
         f"UID={user};"
         f"PWD={password};"
+        f"Encrypt={encrypt};"
     )
     return conn
