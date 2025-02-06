@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sql-data-compare"
+description = "Simple data comparison of the result set from two different queries, that could also be from two different data sources."
+version = "0.1.0"
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["pyodbc>=5.2.0", "python-dotenv==1.0.1"]
+
+[project.urls]
+Repository = "https://github.com/nathanthorell/sql-data-compare"
+
+[project.optional-dependencies]
+lint = ["ruff", "mypy", "pyodbc-stubs"]
+test = ["pytest"]
+dev = ["sql_data_compare[test,lint]"]
+
+[project.scripts]
+pygame-rpg = "sql_data_compare.main:main"
+
+[tool.ruff]
+target-version = "py312"
+indent-width = 4
+line-length = 100
+exclude = ["*.json"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "W", "C90"]
+
+[tool.ruff.format]
+indent-style = "space"
+line-ending = "auto"
+quote-style = "double"
+
+[tool.mypy]
+disallow_untyped_defs = true
+python_version = "3.12"
+warn_return_any = true
+strict = true                      # Added for stricter type checking
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = "pyodbc"
+ignore_missing_imports = true
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options] # Added pytest configuration
+testpaths = ["tests"]
+addopts = "-v --cov=sql_data_compare --cov-report=term-missing --cov-report=xml"

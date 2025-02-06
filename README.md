@@ -1,19 +1,33 @@
 # sql-data-compare
 
-Simple data comparison of the result set from two different queries, that could also be from two different data sources.
+A Python tool for comparing SQL query results across different data sources. It executes queries against two databases and compares their result sets, making it useful for data validation and migration verification.
 
-## Local Env Setup
+Currently optimized for Microsoft SQL Server, with possible support for PostgreSQL and MySQL in future versions.
 
-1. python -m venv .venv/
-1. source .venv/bin/activate
-1. python -m pip install -r ./requirements.txt
+## Local Installation
 
-  - Note: on Apple Silicon use `brew install unixodbc` and `pip install --no-binary :all: pyodbc`
-  - Also [https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/install-microsoft-odbc-driver-sql-server-macos?view=sql-server-ver16#microsoft-odbc-18]
+```bash
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate
 
-## Config Setup
+# Install package with development dependencies
+make install
+```
 
-A `config.json` file is required. Example:
+## Configuration
+
+### Database Support
+
+Currently tested with Microsoft SQL Server using the ODBC Driver 18. While pyodbc supports other databases, you may need to modify the connection string format and SQL syntax for other database engines.
+
+### SQL Queries
+
+Store your SQL queries in the `sql/` directory at the project root. Each comparison can reference two different query files.
+
+### Config File
+
+Create a config.json file at the project root:
 
 ```json
 {
@@ -27,21 +41,39 @@ A `config.json` file is required. Example:
 }
 ```
 
-## Environment Variable Setup
+## Environment Variables
 
-These are required
+Required environment variables can be set directly or via a .env file in your working directory:
 
 ```text
 DB_DRIVER="ODBC Driver 18 for SQL Server"
 DB_ENCRYPT=no
+
+# Left database connection
 LEFT_DB_HOST=
 LEFT_DB_NAME=
 LEFT_DB_PORT=
 LEFT_DB_USER=
 LEFT_DB_PASS=
+
+# Right database connection
 RIGHT_DB_HOST=
 RIGHT_DB_NAME=
 RIGHT_DB_PORT=
 RIGHT_DB_USER=
 RIGHT_DB_PASS=
+```
+
+## Usage
+
+```bash
+# Run comparisons
+make run
+
+# Development commands
+make lint        # Run ruff and mypy
+make test        # Run pytest
+make coverage    # Run tests with coverage
+make format      # Format code with ruff
+make clean       # Clean build artifacts
 ```

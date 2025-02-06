@@ -1,0 +1,9 @@
+{
+  "compare_list": [
+    {
+      "name": "example compare",
+      "left_query_file": "old_query.sql",
+      "right_query_file": "new_query.sql"
+    }
+  ]
+}
