@@ -20,7 +20,7 @@ test = ["pytest"]
 dev = ["sql_data_compare[test,lint]"]
 
 [project.scripts]
-pygame-rpg = "sql_data_compare.main:main"
+sql_data_compare = "sql_data_compare.main:main"
 
 [tool.ruff]
 target-version = "py312"
