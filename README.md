@@ -2,7 +2,7 @@
 
 A Python tool for comparing SQL query results across different data sources. It executes queries against two databases and compares their result sets, making it useful for data validation and migration verification.
 
-Currently optimized for Microsoft SQL Server, with possible support for PostgreSQL and MySQL in future versions.
+Supports both Microsoft SQL Server and PostgreSQL databases, with a flexible configuration system that allows comparing data across different database types.
 
 ## Local Installation
 
@@ -19,7 +19,15 @@ make install
 
 ### Database Support
 
-Currently tested with Microsoft SQL Server using the ODBC Driver 18. While pyodbc supports other databases, you may need to modify the connection string format and SQL syntax for other database engines.
+This tool supports both Microsoft SQL Server and PostgreSQL databases:
+
+Microsoft SQL Server: Tested with ODBC Driver 18. Connection strings are automatically formatted for SQL Server.
+PostgreSQL: Implemented using the psycopg2 driver.
+
+To specify which database type to use:
+
+In your comparison configuration, set left_db_type and right_db_type to either "mssql" or "pg"
+Ensure you have the appropriate environment variables configured for each database type
 
 ### SQL Queries
 
@@ -34,12 +42,16 @@ Create a config.json file at the project root:
   "compare_list": [
     {
       "name": "example compare",
+      "left_db_type": "mssql",
       "left_query_file": "old_query.sql",
+      "right_db_type": "pg",
       "right_query_file": "new_query.sql"
     }
   ]
 }
 ```
+
+You can mix and match database types for your comparisons as needed. SQL syntax differences between database engines should be handled in your query files.
 
 ## Environment Variables
 

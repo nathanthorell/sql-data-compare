@@ -1,7 +1,13 @@
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, List, TypedDict
+from typing import Any, List, TypedDict, Union
+
+import psycopg2
+import pyodbc
+
+ConnectionType = Union[pyodbc.Connection, "psycopg2.extensions.connection"]
+CursorType = Union[pyodbc.Cursor, "psycopg2.extensions.cursor"]
 
 
 @dataclass
@@ -31,11 +37,14 @@ class ComparisonResult:
         )
 
 
+@dataclass
 class ComparisonItem(TypedDict):
     """Type definition for a single comparison configuration"""
 
     name: str
+    left_db_type: str
     left_query_file: str
+    right_db_type: str
     right_query_file: str
 
 
@@ -73,7 +82,9 @@ class ComparisonConfig:
                 comparisons.append(
                     ComparisonItem(
                         name=comp["name"],
+                        left_db_type=comp["left_db_type"],
                         left_query_file=comp["left_query_file"],
+                        right_db_type=comp["right_db_type"],
                         right_query_file=comp["right_query_file"],
                     )
                 )
