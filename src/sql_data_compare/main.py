@@ -1,4 +1,3 @@
-import logging
 import sys
 from pathlib import Path
 
@@ -6,11 +5,10 @@ from dotenv import load_dotenv
 
 from sql_data_compare.comparison import run_comparisons
 from sql_data_compare.types import ComparisonConfig
+from utils.rich_utils import console
 
 
 def main() -> int:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
     try:
         # Load .env from current working directory if it exists
         load_dotenv(override=True)
@@ -22,9 +20,11 @@ def main() -> int:
 
         # Ensure directories exist
         if not sql_dir.exists():
-            raise FileNotFoundError(f"SQL directory not found: {sql_dir}")
+            console.print(f"[bold red]SQL directory not found:[/] {sql_dir}")
+            return 1
         if not config_path.exists():
-            raise FileNotFoundError(f"Config file not found: {config_path}")
+            console.print(f"[bold red]Config file not found:[/] {config_path}")
+            return 1
 
         # Load config and run comparisons
         config = ComparisonConfig(config_path, sql_dir)
@@ -33,7 +33,7 @@ def main() -> int:
         return 0 if success else 1
 
     except Exception as e:
-        logging.error(f"Fatal error: {e}")
+        console.print(f"[bold red]Fatal error:[/] {e}")
         return 1
 
 

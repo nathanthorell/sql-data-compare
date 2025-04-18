@@ -6,6 +6,8 @@ from typing import Any, List, TypedDict, Union
 import psycopg2
 import pyodbc
 
+from utils.rich_utils import COLORS, console
+
 ConnectionType = Union[pyodbc.Connection, "psycopg2.extensions.connection"]
 CursorType = Union[pyodbc.Cursor, "psycopg2.extensions.cursor"]
 
@@ -35,6 +37,35 @@ class ComparisonResult:
             f"Left:  {self.left.row_count} rows, {self.left.duration:.2f}s\n"
             f"Right: {self.right.row_count} rows, {self.right.duration:.2f}s"
         )
+
+    def rich_display(self) -> None:
+        """Display the comparison result using Rich formatting"""
+        status_color = "green" if self.is_equal else "red"
+        row_color = "green" if self.row_count_match else "yellow"
+
+        # Performance comparison
+        if self.left.duration > 0 and self.right.duration > 0:
+            perf_ratio = self.right.duration / self.left.duration
+            perf_text = f"{perf_ratio:.2f}x" + (" faster" if perf_ratio < 1 else " slower")
+            perf_color = "green" if perf_ratio < 1 else "yellow" if perf_ratio < 2 else "red"
+        else:
+            perf_text = "N/A"
+            perf_color = "white"
+
+        console.rule(
+            f"[bold]Comparison Result: [{status_color}]"
+            + f"{self.is_equal and 'EQUAL' or 'NOT EQUAL'}[/]"
+        )
+
+        console.print(
+            f"[bold]Rows:[/] [bold {row_color}]{self.left.row_count}[/] vs "
+            + f"[bold {row_color}]{self.right.row_count}[/]"
+        )
+        console.print(f"[bold]Performance:[/] [{perf_color}]{perf_text}[/]")
+
+        console.print(f"[dim]Left:[/] {self.left.row_count} rows, {self.left.duration:.2f}s")
+        console.print(f"[dim]Right:[/] {self.right.row_count} rows, {self.right.duration:.2f}s")
+        console.print()
 
 
 @dataclass
@@ -98,3 +129,19 @@ class ComparisonConfig:
 
         with open(self.sql_dir / filename) as f:
             return f.read()
+
+    def rich_display(self) -> None:
+        """Display the configuration using Rich formatting"""
+        console.rule("[bold]Comparison Configuration")
+
+        for i, comp in enumerate(self.comparisons):
+            color = COLORS[i % len(COLORS)]
+            console.print(f"[bold {color}]{comp['name']}[/]")
+            console.print(
+                f"  Left:  [{color}]{comp['left_db_type']}[/] - {comp['left_query_file']}"
+            )
+            console.print(
+                f"  Right: [{color}]{comp['right_db_type']}[/] - {comp['right_query_file']}"
+            )
+
+        console.print()

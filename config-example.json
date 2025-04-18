@@ -2,7 +2,9 @@
   "compare_list": [
     {
       "name": "example compare",
+      "left_db_type": "mssql",
       "left_query_file": "old_query.sql",
+      "right_db_type": "pg",
       "right_query_file": "new_query.sql"
     }
   ]

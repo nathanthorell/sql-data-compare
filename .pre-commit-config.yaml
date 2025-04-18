@@ -29,4 +29,5 @@ repos:
             pyodbc,
             python-dotenv,
             types-psycopg2,
+            rich,
           ]
